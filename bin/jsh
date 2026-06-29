@@ -1,5 +1,7 @@
 #!/bin/sh
 
+JSH_VERSION="1.0.0"
+
 backup() {
   TS=$(date +%Y%m%d-%H%M%S)
   mkdir -p "$HOME/.config/jsh/backups"
@@ -16,7 +18,7 @@ backup() {
 
 case "$1" in
   version)
-    echo "JSH 1.0.0"
+    echo "JSH $JSH_VERSION"
     ;;
 
   backup)
@@ -25,18 +27,28 @@ case "$1" in
 
   reset)
     cp "$HOME/.config/jsh/current/mac.zsh.default" "$HOME/.config/jsh/current/mac.zsh"
-    exec zsh
+    echo "✓ JSH reset completed."
     ;;
 
   list)
+    echo "📦 JSH Backups:"
+    echo
     ls -lah "$HOME/.config/jsh/backups"
     ;;
 
   doctor)
     echo "JSH Doctor"
+    echo "Version: $JSH_VERSION"
     echo "Shell: $SHELL"
     echo "Config: $HOME/.config/jsh"
+    echo "Project: $HOME/Projects/JSH"
     echo "Bin: $HOME/.local/bin/jsh"
+    ;;
+
+  update)
+    cd "$HOME/Projects/JSH" || exit 1
+    git pull
+    ./install.sh
     ;;
 
   ui)
@@ -50,19 +62,21 @@ case "$1" in
       echo "2) Reset"
       echo "3) List backups"
       echo "4) Doctor"
-      echo "5) Version"
-      echo "6) Exit"
+      echo "5) Update"
+      echo "6) Version"
+      echo "7) Exit"
       echo
       printf "Select: "
       read choice
 
       case "$choice" in
-        1) clear; backup; read -p "Press Enter..." ;;
-        2) clear; "$0" reset ;;
+        1) clear; "$0" backup; read -p "Press Enter..." ;;
+        2) clear; "$0" reset; read -p "Press Enter..." ;;
         3) clear; "$0" list; read -p "Press Enter..." ;;
         4) clear; "$0" doctor; read -p "Press Enter..." ;;
-        5) clear; "$0" version; read -p "Press Enter..." ;;
-        6) exit 0 ;;
+        5) clear; "$0" update; read -p "Press Enter..." ;;
+        6) clear; "$0" version; read -p "Press Enter..." ;;
+        7) exit 0 ;;
         *) echo "Invalid choice"; sleep 1 ;;
       esac
     done
@@ -76,5 +90,6 @@ case "$1" in
     echo "  jsh reset"
     echo "  jsh list"
     echo "  jsh doctor"
+    echo "  jsh update"
     ;;
 esac
