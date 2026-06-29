@@ -1,0 +1,42 @@
+#!/bin/sh
+
+case "$1" in
+  version)
+    echo "JSH 1.0.0"
+    ;;
+
+  backup)
+    mkdir -p "$HOME/.config/jsh/backups"
+    cp "$HOME/.config/jsh/current/mac.zsh" \
+       "$HOME/.config/jsh/backups/mac.zsh.$(date +%Y%m%d-%H%M%S)"
+    cp "$HOME/.config/jsh/current/mac.zsh" \
+       "$HOME/.config/jsh/current/mac.zsh.default"
+    echo "✓ JSH backup completed."
+    ;;
+
+  reset)
+    cp "$HOME/.config/jsh/current/mac.zsh.default" \
+       "$HOME/.config/jsh/current/mac.zsh"
+    exec zsh
+    ;;
+
+  list)
+    ls -lah "$HOME/.config/jsh/backups"
+    ;;
+
+  doctor)
+    echo "JSH Doctor"
+    echo "Shell: $SHELL"
+    echo "Config: $HOME/.config/jsh"
+    echo "Bin: $HOME/.local/bin/jsh"
+    ;;
+
+  *)
+    echo "JSH commands:"
+    echo "  jsh version"
+    echo "  jsh backup"
+    echo "  jsh reset"
+    echo "  jsh list"
+    echo "  jsh doctor"
+    ;;
+esac
