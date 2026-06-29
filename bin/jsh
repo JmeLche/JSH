@@ -1,22 +1,30 @@
 #!/bin/sh
 
+backup() {
+  TS=$(date +%Y%m%d-%H%M%S)
+  mkdir -p "$HOME/.config/jsh/backups"
+  ARCHIVE="$HOME/.config/jsh/backups/JSH-Backup-$TS.tar.gz"
+
+  tar -czf "$ARCHIVE" \
+    "$HOME/.config/jsh" \
+    "$HOME/.zshrc" \
+    "$HOME/Projects/JSH" 2>/dev/null
+
+  echo "✅ JSH Backup completed."
+  echo "📦 $ARCHIVE"
+}
+
 case "$1" in
   version)
     echo "JSH 1.0.0"
     ;;
 
   backup)
-    mkdir -p "$HOME/.config/jsh/backups"
-    cp "$HOME/.config/jsh/current/mac.zsh" \
-       "$HOME/.config/jsh/backups/mac.zsh.$(date +%Y%m%d-%H%M%S)"
-    cp "$HOME/.config/jsh/current/mac.zsh" \
-       "$HOME/.config/jsh/current/mac.zsh.default"
-    echo "✓ JSH backup completed."
+    backup
     ;;
 
   reset)
-    cp "$HOME/.config/jsh/current/mac.zsh.default" \
-       "$HOME/.config/jsh/current/mac.zsh"
+    cp "$HOME/.config/jsh/current/mac.zsh.default" "$HOME/.config/jsh/current/mac.zsh"
     exec zsh
     ;;
 
@@ -31,8 +39,38 @@ case "$1" in
     echo "Bin: $HOME/.local/bin/jsh"
     ;;
 
+  ui)
+    while true; do
+      clear
+      echo "═══════════════════════════════"
+      echo "        JSH Control Center"
+      echo "═══════════════════════════════"
+      echo
+      echo "1) Backup"
+      echo "2) Reset"
+      echo "3) List backups"
+      echo "4) Doctor"
+      echo "5) Version"
+      echo "6) Exit"
+      echo
+      printf "Select: "
+      read choice
+
+      case "$choice" in
+        1) clear; backup; read -p "Press Enter..." ;;
+        2) clear; "$0" reset ;;
+        3) clear; "$0" list; read -p "Press Enter..." ;;
+        4) clear; "$0" doctor; read -p "Press Enter..." ;;
+        5) clear; "$0" version; read -p "Press Enter..." ;;
+        6) exit 0 ;;
+        *) echo "Invalid choice"; sleep 1 ;;
+      esac
+    done
+    ;;
+
   *)
     echo "JSH commands:"
+    echo "  jsh ui"
     echo "  jsh version"
     echo "  jsh backup"
     echo "  jsh reset"
